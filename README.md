@@ -21,8 +21,8 @@ A React-based markdown editor with AI writing assistance tools powered by Google
    ```
 
 2. **Configure API Key**:
-   - Open `src/App.js`
-   - Replace the empty `apiKey` variable with your Google Gemini API key
+   - Copy `.env.example` to `.env`
+   - Replace `your_api_key_here` with your Google Gemini API key
    - Get your API key from: https://makersuite.google.com/app/apikey
 
 3. **Start the development server**:

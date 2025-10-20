@@ -2,18 +2,148 @@ import React, { useState, useRef, useMemo } from 'react';
 import { marked } from 'marked';
 
 // --- Environment Setup (API constants) ---
-const apiKey = "";
+const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
 // --- Initial Content ---
-const initialMarkdown = `# The Art of Subdomain Hosting
+const initialMarkdown = `# Markdown Syntax Guide
 
-This document explores the fascinating world of hosting applications on subdomains. Subdomains allow developers to segment different parts of a project, creating clean separation for specific tools or features without needing entirely new domain names. For instance, a main site might be at \`example.com\`, while an internal tool lives at \`app.example.com\` and a blog at \`blog.example.com\`.
+## Headers
 
-## Technical Considerations
-Setting up a subdomain involves DNS configuration, specifically creating an A record or CNAME record that points the subdomain to a new server or a specific directory on an existing server. This is crucial for maintaining performance and security isolation. The performance benefits often come from dedicated server resources, especially if the application at the subdomain is resource-intensive.
+# H1 Header
+## H2 Header
+### H3 Header
+#### H4 Header
+##### H5 Header
+###### H6 Header
 
-> "Modularity is the key to scalable software." - P. J. Plauger`;
+## Text Formatting
+
+**Bold text** or __bold text__
+*Italic text* or _italic text_
+***Bold and italic*** or ___bold and italic___
+~~Strikethrough text~~
+\`Inline code\`
+
+## Lists
+
+### Unordered Lists
+- Item 1
+- Item 2
+  - Nested item 2.1
+  - Nested item 2.2
+- Item 3
+
+### Ordered Lists
+1. First item
+2. Second item
+   1. Nested item 2.1
+   2. Nested item 2.2
+3. Third item
+
+### Task Lists
+- [x] Completed task
+- [ ] Incomplete task
+- [ ] Another task
+
+## Links and Images
+
+[Link text](https://example.com)
+[Link with title](https://example.com "Title")
+
+![Alt text](https://via.placeholder.com/150)
+![Image with title](https://via.placeholder.com/200 "Image Title")
+
+## Code Blocks
+
+### Inline Code
+Use \`console.log()\` to print output.
+
+### Code Blocks
+\`\`\`javascript
+function greet(name) {
+  return \`Hello, \${name}!\`;
+}
+
+console.log(greet("World"));
+\`\`\`
+
+\`\`\`python
+def fibonacci(n):
+    if n <= 1:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)
+
+print(fibonacci(10))
+\`\`\`
+
+## Blockquotes
+
+> This is a blockquote.
+> It can span multiple lines.
+>
+> > Nested blockquotes are also possible.
+
+## Tables
+
+| Name | Age | City |
+|------|-----|------|
+| John | 25 | NYC |
+| Jane | 30 | LA |
+| Bob | 35 | Chicago |
+
+| Left Aligned | Center Aligned | Right Aligned |
+|:-------------|:--------------:|--------------:|
+| Left | Center | Right |
+| Text | Text | Text |
+
+## Horizontal Rules
+
+---
+
+***
+
+___
+
+## Line Breaks
+
+This is line one  
+This is line two (two spaces at end of previous line)
+
+This is a new paragraph.
+
+## Escape Characters
+
+\\*Not italic\\*
+\\**Not bold\\**
+\\[Not a link\\]
+
+## HTML Elements
+
+<kbd>Ctrl</kbd> + <kbd>C</kbd>
+
+<mark>Highlighted text</mark>
+
+<sub>Subscript</sub> and <sup>Superscript</sup>
+
+## Footnotes
+
+Here's a sentence with a footnote[^1].
+
+[^1]: This is the footnote content.
+
+## Definition Lists
+
+Term 1
+: Definition 1
+
+Term 2
+: Definition 2a
+: Definition 2b
+
+---
+
+*This guide covers most common Markdown syntax. Try editing and see the live preview!*`;
 
 const App = () => {
     // --- State Management ---
@@ -22,6 +152,7 @@ const App = () => {
     const [statusMessage, setStatusMessage] = useState('Ready.');
     const [selectedTone, setSelectedTone] = useState('professional');
     const [htmlPreview, setHtmlPreview] = useState('');
+    const [showingSummary, setShowingSummary] = useState(false);
     const editorRef = useRef(null);
 
     // --- Core Logic: Markdown Parsing ---
@@ -215,13 +346,9 @@ const App = () => {
             const summaryText = await callGeminiApi(userQuery, systemPrompt);
 
             const summaryHtml = marked.parse(`## Document Summary ✨\n\n${summaryText}`);
-            // Temporarily replace the preview with the summary in a highlighted box
-            setHtmlPreview(
-                `<div class="p-6 bg-indigo-50 border-l-4 border-indigo-400 rounded-lg shadow-inner">
-                    ${summaryHtml}
-                </div>`
-            );
-            showStatus("Summary generated and displayed in Preview. (Type again to restore original preview)", false);
+            setHtmlPreview(summaryHtml);
+            setShowingSummary(true);
+            showStatus("Summary generated and displayed in Preview. Click × to close.", false);
 
         } catch (error) {
             showStatus(`Error: ${error.message}`, true);
@@ -231,32 +358,9 @@ const App = () => {
         }
     };
 
-    const continueWriting = async () => {
-        const markdown = markdownText.trim();
-
-        if (!markdown) {
-            showStatus("Editor is empty. Start writing first!", true);
-            return;
-        }
-
-        toggleLoading(true);
-
-        try {
-            const systemPrompt = "You are a creative writing assistant. Continue the user's text naturally and seamlessly for about 3-5 sentences. Maintain the existing tone and style. Output only the generated continuation text. Preserve markdown formatting if used in the continuation.";
-            const userQuery = `Continue the following text:\n\n${markdown}`;
-
-            const continuation = await callGeminiApi(userQuery, systemPrompt);
-
-            // Append the continuation to the editor
-            setMarkdownText(current => current + '\n\n' + continuation);
-            showStatus("Writing continued successfully.", false);
-
-        } catch (error) {
-            showStatus(`Error: ${error.message}`, true);
-            console.error(error);
-        } finally {
-            toggleLoading(false);
-        }
+    const closeSummary = () => {
+        setHtmlPreview('');
+        setShowingSummary(false);
     };
 
     // Reset preview when markdown changes
@@ -272,7 +376,7 @@ const App = () => {
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <header className="mb-8 pb-4 border-b-2 border-indigo-300">
-                    <h1 className="text-4xl font-extrabold text-indigo-700">AI-Powered Writing Studio</h1>
+                    <h1 className="text-4xl font-extrabold text-indigo-700">AI-Powered Markdown Editor</h1>
                     <p className="text-gray-500 mt-1">Refine, extend, and correct your content using advanced AI tools.</p>
                 </header>
 
@@ -315,10 +419,7 @@ const App = () => {
                                 className="px-5 py-2 bg-pink-500 text-white font-semibold rounded-full shadow-md hover:bg-pink-600 transition duration-150 disabled:opacity-50 disabled:shadow-none">
                             Summarize Content ✨
                         </button>
-                        <button onClick={continueWriting} disabled={loading}
-                                className="px-5 py-2 bg-green-500 text-white font-semibold rounded-full shadow-md hover:bg-green-600 transition duration-150 disabled:opacity-50 disabled:shadow-none">
-                            Continue Writing ✍️
-                        </button>
+
                         
                         {/* Status/Loading */}
                         <div className="flex items-center space-x-3 ml-auto min-w-[150px] mt-4 md:mt-0">
@@ -352,16 +453,18 @@ const App = () => {
 
                     {/* 2. HTML Preview (Output) */}
                     <div className="flex flex-col">
-                        <h2 className="text-xl font-bold mb-3 text-gray-700">Live Preview</h2>
+                        <div className="flex justify-between items-center mb-3">
+                            <h2 className="text-xl font-bold text-gray-700">Live Preview</h2>
+                            {showingSummary && (
+                                <button onClick={closeSummary} className="bg-red-500 text-white rounded-full w-6 h-6 text-sm hover:bg-red-600 transition-colors" title="Close Summary">×</button>
+                            )}
+                        </div>
                         <div 
                             id="preview"
                             dangerouslySetInnerHTML={{ __html: displayHtml }}
-                            className="flex-grow p-5 text-base border-2 border-indigo-300 rounded-xl shadow-2xl 
-                                     bg-white overflow-y-auto leading-relaxed
-                                     prose prose-indigo max-w-none 
-                                     [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-6 
-                                     [&_blockquote]:border-l-4 [&_blockquote]:border-indigo-500 [&_blockquote]:pl-4 
-                                     [&_pre]:bg-gray-800 [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:text-sm [&_pre]:text-gray-200"
+                            className={`flex-grow p-5 text-base border-2 rounded-xl shadow-2xl overflow-y-auto leading-relaxed prose prose-indigo max-w-none [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-6 [&_blockquote]:border-l-4 [&_blockquote]:border-indigo-500 [&_blockquote]:pl-4 [&_pre]:bg-gray-800 [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:text-sm [&_pre]:text-gray-200 ${
+                                showingSummary ? 'bg-indigo-50 border-indigo-400 border-l-4' : 'bg-white border-indigo-300'
+                            }`}
                         />
                     </div>
                 </div>
