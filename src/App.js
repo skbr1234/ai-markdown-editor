@@ -153,6 +153,7 @@ const App = () => {
     const [selectedTone, setSelectedTone] = useState('professional');
     const [htmlPreview, setHtmlPreview] = useState('');
     const [showingSummary, setShowingSummary] = useState(false);
+    const [isDark, setIsDark] = useState(true);
     const editorRef = useRef(null);
 
     // --- Core Logic: Markdown Parsing ---
@@ -363,6 +364,11 @@ const App = () => {
         setShowingSummary(false);
     };
 
+    const toggleTheme = () => {
+        setIsDark(!isDark);
+        document.body.classList.toggle('dark');
+    };
+
     // Reset preview when markdown changes
     React.useEffect(() => {
         if (htmlPreview) {
@@ -372,10 +378,10 @@ const App = () => {
     
     // --- JSX Render ---
     return (
-        <div className="bg-gray-50 min-h-screen font-sans">
+        <div className={`min-h-screen font-sans ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
             <div className="max-w-full">
                 {/* Compact Toolbar */}
-                <div className="p-1 bg-gray-100 border-b border-gray-300">
+                <div className={`p-1 border-b ${isDark ? 'bg-gray-800 border-gray-600' : 'bg-gray-100 border-gray-300'}`}>
                     <div className="flex flex-wrap gap-1 items-center text-xs">
                         
                         <button onClick={changeTone} disabled={loading} className="px-2 py-1 bg-gray-200 hover:bg-gray-300 border rounded text-xs disabled:opacity-50">
@@ -395,13 +401,16 @@ const App = () => {
                         <button onClick={fixGrammarTone} disabled={loading} className="px-2 py-1 bg-gray-200 hover:bg-gray-300 border rounded text-xs disabled:opacity-50">
                             🧐 Fix Grammar
                         </button>
-                        <button onClick={summarizeContent} disabled={loading} className="px-2 py-1 bg-gray-200 hover:bg-gray-300 border rounded text-xs disabled:opacity-50">
+                        <button onClick={summarizeContent} disabled={loading} className={`px-2 py-1 border rounded text-xs disabled:opacity-50 ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-gray-200' : 'bg-gray-200 hover:bg-gray-300'}`}>
                             ✨ Summarize
+                        </button>
+                        <button onClick={toggleTheme} className={`px-2 py-1 border rounded text-xs ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-gray-200' : 'bg-gray-200 hover:bg-gray-300'}`}>
+                            {isDark ? '☀️' : '🌙'}
                         </button>
 
                         <div className="flex items-center gap-1 ml-auto">
                             {loading && <div className="animate-spin rounded-full h-3 w-3 border border-gray-400 border-t-transparent"></div>}
-                            <span className={`text-xs ${statusMessage.includes('Error') ? 'text-red-600' : 'text-gray-600'}`}>{statusMessage}</span>
+                            <span className={`text-xs ${statusMessage.includes('Error') ? 'text-red-600' : isDark ? 'text-gray-300' : 'text-gray-600'}`}>{statusMessage}</span>
                         </div>
                     </div>
                 </div>
@@ -433,8 +442,10 @@ const App = () => {
                         <div 
                             id="preview"
                             dangerouslySetInnerHTML={{ __html: displayHtml }}
-                            className={`flex-grow p-5 text-base border-2 rounded-xl shadow-2xl overflow-y-auto leading-relaxed prose prose-indigo max-w-none [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-6 [&_blockquote]:border-l-4 [&_blockquote]:border-indigo-500 [&_blockquote]:pl-4 [&_pre]:bg-gray-800 [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:text-sm [&_pre]:text-gray-200 ${
-                                showingSummary ? 'bg-indigo-50 border-indigo-400 border-l-4' : 'bg-white border-indigo-300'
+                            className={`flex-grow p-5 text-base border-2 rounded-xl shadow-2xl overflow-y-auto leading-relaxed prose max-w-none [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-6 [&_blockquote]:border-l-4 [&_blockquote]:pl-4 [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:text-sm ${
+                                showingSummary 
+                                    ? isDark ? 'bg-indigo-900 border-indigo-500 border-l-4 text-gray-200 prose-invert' : 'bg-indigo-50 border-indigo-400 border-l-4 prose-indigo'
+                                    : isDark ? 'bg-gray-800 border-gray-600 text-gray-200 prose-invert [&_blockquote]:border-indigo-400 [&_pre]:bg-gray-900 [&_pre]:text-gray-200' : 'bg-white border-indigo-300 prose-indigo [&_blockquote]:border-indigo-500 [&_pre]:bg-gray-800 [&_pre]:text-gray-200'
                             }`}
                         />
                     </div>
@@ -442,7 +453,7 @@ const App = () => {
             </div>
             
             {/* Fixed Footer */}
-            <footer className="fixed bottom-0 left-0 right-0 text-center py-1 text-xs text-gray-500 border-t border-gray-300 bg-gray-100">
+            <footer className={`fixed bottom-0 left-0 right-0 text-center py-1 text-xs border-t ${isDark ? 'text-gray-400 border-gray-600 bg-gray-800' : 'text-gray-500 border-gray-300 bg-gray-100'}`}>
                 © 2024 AI-Powered Markdown Editor
             </footer>
         </div>
