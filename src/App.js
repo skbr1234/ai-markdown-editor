@@ -372,73 +372,45 @@ const App = () => {
     
     // --- JSX Render ---
     return (
-        <div className="bg-gray-50 min-h-screen p-4 md:p-8 font-sans">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <header className="mb-8 pb-4 border-b-2 border-indigo-300">
-                    <h1 className="text-4xl font-extrabold text-indigo-700">AI-Powered Markdown Editor</h1>
-                    <p className="text-gray-500 mt-1">Refine, extend, and correct your content using advanced AI tools.</p>
-                </header>
-
-                {/* AI Controls and Status */}
-                <div className="mb-8 p-5 bg-white rounded-2xl shadow-xl border border-indigo-100">
-                    <h2 className="text-xl font-bold text-gray-800 mb-4">Writing Assistant Tools</h2>
-                    <div className="flex flex-wrap gap-4 items-center">
+        <div className="bg-gray-50 min-h-screen font-sans">
+            <div className="max-w-full">
+                {/* Compact Toolbar */}
+                <div className="p-1 bg-gray-100 border-b border-gray-300">
+                    <div className="flex flex-wrap gap-1 items-center text-xs">
                         
-                        {/* Change Tone Group */}
-                        <div className="flex items-center gap-3 bg-purple-50 p-3 rounded-full shadow-inner">
-                            <button onClick={changeTone} disabled={loading}
-                                    className="px-5 py-2 bg-purple-600 text-white font-semibold rounded-full shadow-md hover:bg-purple-700 transition duration-150 disabled:opacity-50 disabled:shadow-none">
-                                Change Tone 🎭
-                            </button>
-                            <select 
-                                id="toneSelector" 
-                                value={selectedTone} 
-                                onChange={(e) => setSelectedTone(e.target.value)} 
-                                disabled={loading}
-                                className="bg-purple-100 text-purple-800 font-medium py-2 px-4 rounded-full border border-purple-300 focus:ring-purple-500 focus:border-purple-500 text-sm appearance-none cursor-pointer disabled:opacity-50"
-                            >
-                                <option value="professional">Professional</option>
-                                <option value="casual">Casual/Friendly</option>
-                                <option value="academic">Academic</option>
-                                <option value="persuasive">Persuasive</option>
-                                <option value="witty">Witty/Humorous</option>
-                            </select>
-                        </div>
+                        <button onClick={changeTone} disabled={loading} className="px-2 py-1 bg-gray-200 hover:bg-gray-300 border rounded text-xs disabled:opacity-50">
+                            🎭 Change Tone
+                        </button>
+                        <select value={selectedTone} onChange={(e) => setSelectedTone(e.target.value)} disabled={loading} className="px-1 py-1 text-xs border rounded disabled:opacity-50">
+                            <option value="professional">Professional</option>
+                            <option value="casual">Casual</option>
+                            <option value="academic">Academic</option>
+                            <option value="persuasive">Persuasive</option>
+                            <option value="witty">Witty</option>
+                        </select>
 
-                        {/* Quick Action Buttons */}
-                        <button onClick={refineSelection} disabled={loading}
-                                className="px-5 py-2 bg-yellow-500 text-white font-semibold rounded-full shadow-md hover:bg-yellow-600 transition duration-150 disabled:opacity-50 disabled:shadow-none">
-                            Refine Selection ✏️
+                        <button onClick={refineSelection} disabled={loading} className="px-2 py-1 bg-gray-200 hover:bg-gray-300 border rounded text-xs disabled:opacity-50">
+                            ✏️ Refine
                         </button>
-                        <button onClick={fixGrammarTone} disabled={loading}
-                                className="px-5 py-2 bg-blue-500 text-white font-semibold rounded-full shadow-md hover:bg-blue-600 transition duration-150 disabled:opacity-50 disabled:shadow-none">
-                            Fix Grammar & Flow 🧐
+                        <button onClick={fixGrammarTone} disabled={loading} className="px-2 py-1 bg-gray-200 hover:bg-gray-300 border rounded text-xs disabled:opacity-50">
+                            🧐 Fix Grammar
                         </button>
-                        <button onClick={summarizeContent} disabled={loading}
-                                className="px-5 py-2 bg-pink-500 text-white font-semibold rounded-full shadow-md hover:bg-pink-600 transition duration-150 disabled:opacity-50 disabled:shadow-none">
-                            Summarize Content ✨
+                        <button onClick={summarizeContent} disabled={loading} className="px-2 py-1 bg-gray-200 hover:bg-gray-300 border rounded text-xs disabled:opacity-50">
+                            ✨ Summarize
                         </button>
 
-                        
-                        {/* Status/Loading */}
-                        <div className="flex items-center space-x-3 ml-auto min-w-[150px] mt-4 md:mt-0">
-                            {loading && (
-                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-500"></div>
-                            )}
-                            <div className={`text-sm font-medium ${statusMessage.includes('Error') ? 'text-red-600' : 'text-gray-600'}`}>
-                                {statusMessage}
-                            </div>
+                        <div className="flex items-center gap-1 ml-auto">
+                            {loading && <div className="animate-spin rounded-full h-3 w-3 border border-gray-400 border-t-transparent"></div>}
+                            <span className={`text-xs ${statusMessage.includes('Error') ? 'text-red-600' : 'text-gray-600'}`}>{statusMessage}</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Main Editor and Preview Container */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[70vh]">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-1 h-[calc(100vh-60px)]">
 
                     {/* 1. Markdown Editor (Input) */}
                     <div className="flex flex-col">
-                        <h2 className="text-xl font-bold mb-3 text-gray-700">Markdown Source</h2>
                         <textarea
                             ref={editorRef}
                             value={markdownText}
@@ -453,12 +425,11 @@ const App = () => {
 
                     {/* 2. HTML Preview (Output) */}
                     <div className="flex flex-col">
-                        <div className="flex justify-between items-center mb-3">
-                            <h2 className="text-xl font-bold text-gray-700">Live Preview</h2>
-                            {showingSummary && (
-                                <button onClick={closeSummary} className="bg-red-500 text-white rounded-full w-6 h-6 text-sm hover:bg-red-600 transition-colors" title="Close Summary">×</button>
-                            )}
-                        </div>
+                        {showingSummary && (
+                            <div className="flex justify-end p-1">
+                                <button onClick={closeSummary} className="bg-red-500 text-white rounded w-5 h-5 text-xs hover:bg-red-600" title="Close Summary">×</button>
+                            </div>
+                        )}
                         <div 
                             id="preview"
                             dangerouslySetInnerHTML={{ __html: displayHtml }}
@@ -469,6 +440,11 @@ const App = () => {
                     </div>
                 </div>
             </div>
+            
+            {/* Fixed Footer */}
+            <footer className="fixed bottom-0 left-0 right-0 text-center py-1 text-xs text-gray-500 border-t border-gray-300 bg-gray-100">
+                © 2024 AI-Powered Markdown Editor
+            </footer>
         </div>
     );
 };
