@@ -1,4 +1,4 @@
-# AI-Powered Markdown Editor
+# AI-Powered Markdown Editor 
 
 A React-based markdown editor with AI writing assistance tools powered by Google's Gemini API.
 
