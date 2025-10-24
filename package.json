@@ -2,7 +2,7 @@
   "name": "ai-markdown-editor",
   "version": "1.0.0",
   "description": "AI-powered markdown editor with writing assistance tools",
-  "homepage": "https://skbr1234.github.io/ai-markdown-editor",
+  "homepage": "https://ai-markdown-editor.planmydaily.com",
   "main": "src/index.js",
   "scripts": {
     "start": "react-scripts start",
