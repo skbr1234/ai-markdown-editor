@@ -31,6 +31,9 @@ jobs:
         run: npm ci
         
       - name: Build
+        env:
+          REACT_APP_GEMINI_API_KEY: ${{ secrets.REACT_APP_GEMINI_API_KEY }}
+          REACT_APP_GA_MEASUREMENT_ID: ${{ secrets.REACT_APP_GA_MEASUREMENT_ID }}
         run: npm run build
         
       - name: Setup Pages

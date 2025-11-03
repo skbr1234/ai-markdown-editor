@@ -454,7 +454,7 @@ const App = () => {
             
             {/* Fixed Footer */}
             <footer className={`fixed bottom-0 left-0 right-0 text-center py-1 text-xs border-t ${isDark ? 'text-gray-400 border-gray-600 bg-gray-800' : 'text-gray-500 border-gray-300 bg-gray-100'}`}>
-                © 2024 AI-Powered Markdown Editor
+                © 2024 AI-Powered Markdown Editor • <a href="https://planmydaily.com" target="_blank" rel="noopener noreferrer" className="hover:underline">PlanMyDaily.com</a>
             </footer>
         </div>
     );
